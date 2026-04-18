@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#111111">
+    <title>Mac Remote</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="remote-shell">
+      <section class="remote" aria-labelledby="remote-title">
+        <div class="top-bar">
+          <div>
+            <p class="eyebrow">Local Mac</p>
+            <h1 id="remote-title">Playback Remote</h1>
+          </div>
+          <div class="signal" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        <div class="status" role="status" aria-live="polite">
+          <span id="status-dot" class="status-dot"></span>
+          <span id="status-text">Ready</span>
+        </div>
+
+        <div class="transport" aria-label="Playback controls">
+          <button class="seek-button" type="button" data-command="back" data-repeat="true" aria-label="Back">
+            <span class="icon" aria-hidden="true">‹</span>
+            <span>Back</span>
+          </button>
+
+          <button class="play-button" type="button" data-command="play-pause" aria-label="Play or pause">
+            <span class="play-icon" aria-hidden="true"></span>
+            <span>Play / Pause</span>
+          </button>
+
+          <button class="seek-button" type="button" data-command="forward" data-repeat="true" aria-label="Forward">
+            <span class="icon" aria-hidden="true">›</span>
+            <span>Forward</span>
+          </button>
+        </div>
+
+        <div class="hint">
+          Keep the media app focused on your Mac. Hold Back or Forward to keep seeking.
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

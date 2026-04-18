@@ -1,0 +1,14 @@
+{
+  "name": "remote-control",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A local mobile remote for Mac media playback.",
+  "scripts": {
+    "start": "node src/server.js",
+    "check": "node --check src/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
