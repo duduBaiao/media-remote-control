@@ -1,26 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <defs>
-    <linearGradient id="bg" x1="180" y1="90" x2="844" y2="934" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#f8f9fb"/>
-      <stop offset="1" stop-color="#dfe4ea"/>
+    <linearGradient id="bg" x1="204" y1="118" x2="820" y2="906" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fbfcfd"/>
+      <stop offset="1" stop-color="#dbe3eb"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="34" stdDeviation="36" flood-color="#111111" flood-opacity="0.24"/>
+    <linearGradient id="play" x1="300" y1="310" x2="614" y2="716" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#222326"/>
+      <stop offset="1" stop-color="#111111"/>
+    </linearGradient>
+    <filter id="softShadow" x="-28%" y="-28%" width="156%" height="156%">
+      <feDropShadow dx="0" dy="30" stdDeviation="34" flood-color="#111111" flood-opacity="0.22"/>
     </filter>
   </defs>
 
   <rect width="1024" height="1024" rx="228" fill="url(#bg)"/>
-  <rect x="112" y="112" width="800" height="800" rx="180" fill="#ffffff" opacity="0.72"/>
+  <circle cx="512" cy="512" r="356" fill="#ffffff" opacity="0.56"/>
 
-  <g filter="url(#shadow)">
-    <rect x="220" y="274" width="584" height="476" rx="88" fill="#151515"/>
-    <rect x="274" y="328" width="476" height="274" rx="46" fill="#f8f9fb"/>
-    <rect x="344" y="646" width="336" height="42" rx="21" fill="#f8f9fb"/>
+  <g filter="url(#softShadow)">
+    <path d="M324 344V680L616 512L324 344Z" fill="url(#play)"/>
   </g>
 
-  <circle cx="512" cy="465" r="96" fill="#17b890"/>
-  <path d="M482 410L584 465L482 520V410Z" fill="#151515"/>
-
-  <path d="M318 464L390 392V440H444V488H390V536L318 464Z" fill="#ed4d6e"/>
-  <path d="M706 464L634 392V440H580V488H634V536L706 464Z" fill="#f2c94c"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M666 414C716 466 716 558 666 610" stroke="#17b890" stroke-width="52"/>
+    <path d="M728 326C824 424 824 600 728 698" stroke="#ed4d6e" stroke-width="52" opacity="0.92"/>
+  </g>
 </svg>
