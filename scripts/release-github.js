@@ -29,10 +29,12 @@ function run(command, args, options = {}) {
     const { captureOutput = false } = options;
 
     try {
-        return execFileSync(command, args, {
+        const output = execFileSync(command, args, {
             encoding: "utf8",
             stdio: captureOutput ? ["ignore", "pipe", "pipe"] : "inherit"
-        }).trim();
+        });
+
+        return typeof output === "string" ? output.trim() : "";
     } catch (error) {
         const stderr = error.stderr?.toString().trim();
         const stdout = error.stdout?.toString().trim();
