@@ -27,6 +27,9 @@
     "appId": "com.dudu.macremote",
     "productName": "Mac Remote",
     "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "electronLanguages": [
+      "en-US"
+    ],
     "directories": {
       "output": "dist"
     },

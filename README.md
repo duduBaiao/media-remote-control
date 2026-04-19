@@ -98,8 +98,10 @@ APPLE_KEYCHAIN_PROFILE="mac-remote-notary"
 If you have multiple Developer ID certificates, pick one explicitly:
 
 ```text
-CSC_NAME="Developer ID Application: Your Name or Company (TEAMID)"
+CSC_NAME="Your Name or Company (TEAMID)"
 ```
+
+Use the certificate name without the `Developer ID Application: ` prefix. Electron Builder adds the certificate type itself.
 
 For CI, you can provide the signing certificate with `CSC_LINK` and `CSC_KEY_PASSWORD` instead of using a local Keychain certificate.
 
