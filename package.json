@@ -4,12 +4,14 @@
   "private": true,
   "type": "module",
   "main": "src/menu-bar.js",
+  "author": "dudu",
   "description": "A local mobile remote for Mac media playback.",
   "scripts": {
     "app": "electron .",
-    "package:mac": "electron-builder --mac --dir",
+    "package:mac": "electron-builder --mac dir -c.mac.identity=- -c.mac.notarize=false",
+    "dist:mac": "node scripts/with-env.js node scripts/verify-mac-release-env.js && node scripts/with-env.js electron-builder --mac dmg zip --universal && node scripts/with-env.js node scripts/verify-mac-release.js",
     "start": "node src/server.js",
-    "check": "node --check src/server.js && node --check src/menu-bar.js"
+    "check": "node --check src/server.js && node --check src/menu-bar.js && node --check scripts/with-env.js && node --check scripts/verify-mac-release-env.js && node --check scripts/verify-mac-release.js"
   },
   "engines": {
     "node": ">=20"
@@ -22,17 +24,28 @@
     "electron-builder": "^26.8.1"
   },
   "build": {
-    "appId": "dev.local.mac-remote",
+    "appId": "com.dudu.macremote",
     "productName": "Mac Remote",
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
     "directories": {
       "output": "dist"
     },
     "mac": {
       "category": "public.app-category.utilities",
-      "identity": "-",
+      "icon": "build/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
       "target": [
-        "dir"
-      ]
+        "dmg",
+        "zip"
+      ],
+      "extendInfo": {
+        "LSUIElement": true,
+        "NSAppleEventsUsageDescription": "Mac Remote sends keyboard events through System Events so your phone can control focused media playback.",
+        "NSLocalNetworkUsageDescription": "Mac Remote serves a local pairing page so your phone can control this Mac on the same network."
+      }
     }
   }
 }
