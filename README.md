@@ -24,9 +24,10 @@ The menu bar icon also has:
 
 - **Show Pairing QR**
 - **Copy Pairing URL**
-- **Open Remote on This Mac**
 - **Restart Server**
 - **Accessibility Settings**
+
+Debug builds also show **Open Remote on This Mac**. Packaged builds hide that item unless you start them with `REMOTE_DEBUG=1`.
 
 ## Package the Mac App
 

@@ -84,6 +84,7 @@ function bindButton(button) {
 
   button.addEventListener("pointerdown", (event) => {
     event.preventDefault();
+    window.getSelection()?.removeAllRanges();
     pointerIsDown = true;
     button.setPointerCapture(event.pointerId);
     button.classList.add("is-pressed");

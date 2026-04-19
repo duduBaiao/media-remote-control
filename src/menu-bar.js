@@ -14,6 +14,7 @@ import { createRemoteToken, startRemoteServer } from "./server.js";
 const appName = "Media Remote Control";
 const defaultPort = Number.parseInt(process.env.PORT ?? "3000", 10);
 const fallbackPort = 0;
+const showDebugMenuItems = !app.isPackaged || process.env.REMOTE_DEBUG === "1";
 const trayIconPng1x =
   "iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAPklEQVR4nGNgGAW0Av+JUUBQETHq/hNQhCyH17D/WDA2NWQZhK74Pw42/Qyi2Gv45Ik2iBAgVh1RBo0CEgEA6gg3ya0iT68AAAAASUVORK5CYII=";
 const trayIconPng2x =
@@ -90,8 +91,7 @@ async function restartServer() {
 function rebuildMenu() {
   const pairingUrl = getPairingUrl();
   const remoteIsReady = Boolean(serverDetails);
-
-  const menu = Menu.buildFromTemplate([
+  const template = [
     {
       label: remoteIsReady ? "Show Pairing QR" : "Remote Not Running",
       enabled: remoteIsReady,
@@ -101,11 +101,6 @@ function rebuildMenu() {
       label: "Copy Pairing URL",
       enabled: remoteIsReady,
       click: () => clipboard.writeText(pairingUrl)
-    },
-    {
-      label: "Open Remote on This Mac",
-      enabled: remoteIsReady,
-      click: () => shell.openExternal(getLocalBrowserUrl())
     },
     { type: "separator" },
     {
@@ -130,7 +125,22 @@ function rebuildMenu() {
       accelerator: "Command+Q",
       click: () => app.quit()
     }
-  ]);
+  ];
+
+  if (showDebugMenuItems) {
+    template.splice(
+      2,
+      0,
+      {
+        label: "Open Remote on This Mac",
+        enabled: remoteIsReady,
+        click: () => shell.openExternal(getLocalBrowserUrl())
+      },
+      { type: "separator" }
+    );
+  }
+
+  const menu = Menu.buildFromTemplate(template);
 
   tray.setContextMenu(menu);
 }
