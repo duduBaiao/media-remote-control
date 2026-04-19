@@ -121,25 +121,42 @@ function buildRelease() {
     run("npm", ["run", "dist:mac"]);
 }
 
-function findArtifacts(version) {
+function getReleaseInfo(packageJson) {
+    const version = String(packageJson.version || "").trim();
+    const productName = String(packageJson.build?.productName || packageJson.productName || packageJson.name || "").trim();
+
+    if (!version) {
+        fail("package.json does not contain a valid version.");
+    }
+
+    if (!productName) {
+        fail("package.json does not contain a valid product name.");
+    }
+
+    return {
+        version,
+        productName,
+        artifactPrefix: `${productName}-${version}-`
+    };
+}
+
+function findArtifacts(releaseInfo) {
     const distDir = path.join(process.cwd(), "dist");
 
     if (!fs.existsSync(distDir)) {
         fail("dist/ was not created by the build.");
     }
 
-    const versionToken = `-${version}-`;
-
     return fs
         .readdirSync(distDir)
-        .filter((file) => file.includes(versionToken) && (file.endsWith(".dmg") || file.endsWith(".zip")))
+        .filter((file) => file.startsWith(releaseInfo.artifactPrefix) && (file.endsWith(".dmg") || file.endsWith(".zip")))
         .sort()
         .map((file) => path.join("dist", file));
 }
 
-function ensureArtifacts(artifacts, version) {
+function ensureArtifacts(artifacts, releaseInfo) {
     if (artifacts.length === 0) {
-        fail(`No DMG or ZIP artifacts for version ${version} were found in dist/.`);
+        fail(`No DMG or ZIP artifacts for ${releaseInfo.productName} ${releaseInfo.version} were found in dist/.`);
     }
 }
 
@@ -165,13 +182,9 @@ function main() {
     ensureGitHubAuth();
 
     const packageJson = readJson(path.join(process.cwd(), "package.json"));
-    const version = String(packageJson.version || "").trim();
+    const releaseInfo = getReleaseInfo(packageJson);
 
-    if (!version) {
-        fail("package.json does not contain a valid version.");
-    }
-
-    const tagName = `v${version}`;
+    const tagName = `v${releaseInfo.version}`;
 
     ensureNoExistingTag(tagName);
     ensureNoExistingRelease(tagName);
@@ -179,8 +192,8 @@ function main() {
     console.log(`Building release for ${tagName}`);
     buildRelease();
 
-    const artifacts = findArtifacts(version);
-    ensureArtifacts(artifacts, version);
+    const artifacts = findArtifacts(releaseInfo);
+    ensureArtifacts(artifacts, releaseInfo);
 
     console.log(`Pushing branch and tag ${tagName}`);
     pushCurrentBranch();

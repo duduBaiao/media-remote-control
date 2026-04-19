@@ -24,23 +24,76 @@ function run(command, args) {
   }
 }
 
-function findArtifacts() {
+function readJson(filePath) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch (error) {
+    fail(`Could not read ${filePath}: ${error.message}`);
+  }
+}
+
+function getReleaseInfo() {
+  const packageJson = readJson("package.json");
+  const version = String(packageJson.version || "").trim();
+  const productName = String(packageJson.build?.productName || packageJson.productName || packageJson.name || "").trim();
+
+  if (!version) {
+    fail("package.json does not contain a valid version.");
+  }
+
+  if (!productName) {
+    fail("package.json does not contain a valid product name.");
+  }
+
+  return {
+    version,
+    productName,
+    artifactPrefix: `${productName}-${version}-`
+  };
+}
+
+function findArtifacts(artifactPrefix) {
   if (!fs.existsSync("dist")) {
     return [];
   }
 
   return fs
     .readdirSync("dist")
-    .filter((file) => file.endsWith(".dmg") || file.endsWith(".zip"))
+    .filter((file) => file.startsWith(artifactPrefix) && (file.endsWith(".dmg") || file.endsWith(".zip")))
     .map((file) => path.join("dist", file));
+}
+
+function findBuiltApps(productName) {
+  if (!fs.existsSync("dist")) {
+    return [];
+  }
+
+  const preferredDirectories = ["mac-universal", "mac"];
+  const preferredApps = preferredDirectories
+    .map((directory) => path.join("dist", directory, `${productName}.app`))
+    .filter((appPath) => fs.existsSync(appPath));
+
+  if (preferredApps.length > 0) {
+    return preferredApps;
+  }
+
+  return fs
+    .readdirSync("dist", { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith("mac"))
+    .map((entry) => path.join("dist", entry.name, `${productName}.app`))
+    .filter((appPath) => fs.existsSync(appPath));
+}
+
+function verifyApp(appPath) {
+  console.log(`Verifying ${appPath}`);
+  run("xcrun", ["stapler", "validate", appPath]);
+  run("spctl", ["--assess", "--type", "execute", "--verbose=4", appPath]);
 }
 
 function verifyArtifact(artifact) {
   console.log(`Verifying ${artifact}`);
 
   if (artifact.endsWith(".dmg")) {
-    run("xcrun", ["stapler", "validate", artifact]);
-    run("spctl", ["--assess", "--type", "open", "--context", "context:primary-signature", "--verbose=4", artifact]);
     return;
   }
 
@@ -85,10 +138,20 @@ if (process.platform !== "darwin") {
   fail("macOS release verification must run on macOS.");
 }
 
-const artifacts = findArtifacts();
+const releaseInfo = getReleaseInfo();
+const appBundles = findBuiltApps(releaseInfo.productName);
+const artifacts = findArtifacts(releaseInfo.artifactPrefix);
+
+if (appBundles.length === 0) {
+  fail(`No built ${releaseInfo.productName}.app bundle was found in dist/mac*/.`);
+}
 
 if (artifacts.length === 0) {
-  fail("No DMG or ZIP artifacts were found in dist/.");
+  fail(`No DMG or ZIP artifacts for ${releaseInfo.productName} ${releaseInfo.version} were found in dist/.`);
+}
+
+for (const appBundle of appBundles) {
+  verifyApp(appBundle);
 }
 
 for (const artifact of artifacts) {

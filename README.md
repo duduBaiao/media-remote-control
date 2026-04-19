@@ -70,7 +70,7 @@ To build, tag, push, and publish a GitHub release for the current `package.json`
 npm run release:github
 ```
 
-The release command loads `.env`, fails before building if it cannot find release signing or notarization credentials, and checks the finished artifacts with `stapler` and Gatekeeper. Environment variables already set in your shell take priority over values in `.env`.
+The release command loads `.env`, fails before building if it cannot find release signing or notarization credentials, and verifies the notarized app bundle plus the current ZIP artifact contents with `stapler` and Gatekeeper. Environment variables already set in your shell take priority over values in `.env`.
 
 The GitHub release command expects:
 
@@ -79,7 +79,7 @@ The GitHub release command expects:
 - the `origin` remote configured for GitHub
 - GitHub CLI installed and authenticated with `gh auth login`
 
-It reads the current version from `package.json`, runs `npm run dist:mac`, pushes the current branch, creates tag `v<version>`, pushes that tag, and publishes a GitHub release with the generated DMG and ZIP attached.
+It reads the current version from `package.json`, runs `npm run dist:mac`, pushes the current branch, creates tag `v<version>`, pushes that tag, and publishes a GitHub release with the generated DMG and ZIP for the current product name and version attached.
 
 ### Notarization Credentials
 
