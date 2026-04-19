@@ -59,6 +59,10 @@ function commandLabel(command) {
     return "Forward sent";
   }
 
+  if (command === "open-netflix") {
+    return "Netflix ready";
+  }
+
   return "Command sent";
 }
 

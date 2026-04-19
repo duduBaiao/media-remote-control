@@ -136,9 +136,12 @@ The Mac and phone need to be on the same network.
 - **Play / Pause** sends Space.
 - **Back** sends Left Arrow.
 - **Forward** sends Right Arrow.
+- **Open Netflix** focuses an existing Google Chrome Netflix tab or opens Netflix in Google Chrome.
 - Hold **Back** or **Forward** to send repeated key presses.
 
 The media app you want to control should be focused on the Mac.
+
+The Netflix shortcut currently supports Google Chrome only. The first use may trigger a macOS Automation permission prompt because the app needs to inspect Chrome tabs.
 
 ## macOS Permission
 

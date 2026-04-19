@@ -152,20 +152,30 @@ h1 {
   gap: 10px;
 }
 
-.seek-button,
-.play-button {
+.shortcuts {
   display: grid;
-  min-height: 132px;
+  margin-top: 10px;
+}
+
+.seek-button,
+.play-button,
+.shortcut-button {
+  display: grid;
   align-content: center;
   justify-items: center;
   gap: 9px;
-  padding: 16px 10px;
   user-select: none;
   touch-action: manipulation;
   transition:
     background 120ms ease,
     color 120ms ease,
     transform 120ms ease;
+}
+
+.seek-button,
+.play-button {
+  min-height: 132px;
+  padding: 16px 10px;
 }
 
 .seek-button {
@@ -183,10 +193,23 @@ h1 {
   font-weight: 800;
 }
 
+.shortcut-button {
+  grid-template-columns: auto 1fr;
+  min-height: 54px;
+  justify-items: start;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--ink);
+  font-weight: 800;
+}
+
 .seek-button:active,
 .seek-button.is-pressed,
 .play-button:active,
-.play-button.is-pressed {
+.play-button.is-pressed,
+.shortcut-button:active,
+.shortcut-button.is-pressed {
   transform: translateY(1px);
 }
 
@@ -200,10 +223,32 @@ h1 {
   color: var(--ink);
 }
 
+.shortcut-button.is-pressed {
+  background: var(--rose);
+  color: #ffffff;
+}
+
 .icon {
   display: block;
   font-size: 3.9rem;
   line-height: 0.72;
+}
+
+.shortcut-mark {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--rose);
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.shortcut-button.is-pressed .shortcut-mark {
+  background: #ffffff;
+  color: var(--rose);
 }
 
 .play-icon {

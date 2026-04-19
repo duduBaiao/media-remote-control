@@ -26,6 +26,10 @@ const commands = {
   forward: {
     label: "Forward",
     keyCodes: [124]
+  },
+  "open-netflix": {
+    label: "Open Netflix",
+    run: openNetflixInChrome
   }
 };
 
@@ -100,6 +104,34 @@ function runAppleScript(lines) {
       stdio: ["ignore", "pipe", "pipe"]
     });
 
+    let stdout = "";
+    let stderr = "";
+    child.stdout.setEncoding("utf8");
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+    });
+    child.stderr.setEncoding("utf8");
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolve(stdout.trim());
+        return;
+      }
+
+      reject(new Error(stderr.trim() || `osascript exited with code ${code}`));
+    });
+  });
+}
+
+function runProcess(command, args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      stdio: ["ignore", "ignore", "pipe"]
+    });
+
     let stderr = "";
     child.stderr.setEncoding("utf8");
     child.stderr.on("data", (chunk) => {
@@ -112,9 +144,48 @@ function runAppleScript(lines) {
         return;
       }
 
-      reject(new Error(stderr.trim() || `osascript exited with code ${code}`));
+      reject(new Error(stderr.trim() || `${command} exited with code ${code}`));
     });
   });
+}
+
+function createFindNetflixInChromeScript() {
+  return [
+    'tell application "System Events" to set chromeIsRunning to exists (process "Google Chrome")',
+    "if not chromeIsRunning then",
+    'return "missing"',
+    "end if",
+    "if chromeIsRunning then",
+    'tell application "Google Chrome"',
+    "repeat with browserWindow in windows",
+    "set tabCount to count of tabs of browserWindow",
+    "repeat with tabIndex from 1 to tabCount",
+    "set tabUrl to URL of item tabIndex of tabs of browserWindow",
+    'if tabUrl contains "netflix.com" then',
+    "set \u00abclass acTI\u00bb of browserWindow to tabIndex",
+    "try",
+    "set minimized of browserWindow to false",
+    "end try",
+    "set index of browserWindow to 1",
+    "activate",
+    'return "focused"',
+    "end if",
+    "end repeat",
+    "end repeat",
+    "end tell",
+    "end if",
+    'return "missing"'
+  ];
+}
+
+async function openNetflixInChrome() {
+  const result = await runAppleScript(createFindNetflixInChromeScript());
+
+  if (result === "focused") {
+    return;
+  }
+
+  await runProcess("open", ["-a", "Google Chrome", "https://www.netflix.com/browse"]);
 }
 
 async function executeCommand(commandName, isDryRun) {
@@ -137,11 +208,12 @@ async function executeCommand(commandName, isDryRun) {
     return;
   }
 
-  const script = [
-    'tell application "System Events"',
-    ...command.keyCodes.map((keyCode) => `key code ${keyCode}`),
-    "end tell"
-  ];
+  if (command.run) {
+    await command.run();
+    return;
+  }
+
+  const script = ['tell application "System Events"', ...command.keyCodes.map((keyCode) => `key code ${keyCode}`), "end tell"];
 
   await runAppleScript(script);
 }
