@@ -10,8 +10,9 @@
     "app": "electron .",
     "package:mac": "electron-builder --mac dir -c.mac.identity=- -c.mac.notarize=false",
     "dist:mac": "node scripts/with-env.js node scripts/verify-mac-release-env.js && node scripts/with-env.js electron-builder --mac dmg zip --universal && node scripts/with-env.js node scripts/verify-mac-release.js",
+    "release:github": "node scripts/release-github.js",
     "start": "node src/server.js",
-    "check": "node --check src/server.js && node --check src/menu-bar.js && node --check scripts/with-env.js && node --check scripts/verify-mac-release-env.js && node --check scripts/verify-mac-release.js"
+    "check": "node --check src/server.js && node --check src/menu-bar.js && node --check scripts/with-env.js && node --check scripts/verify-mac-release-env.js && node --check scripts/verify-mac-release.js && node --check scripts/release-github.js"
   },
   "engines": {
     "node": ">=20"

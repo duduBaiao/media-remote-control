@@ -64,7 +64,22 @@ The release command builds a universal DMG and ZIP for Apple Silicon and Intel M
 npm run dist:mac
 ```
 
+To build, tag, push, and publish a GitHub release for the current `package.json` version:
+
+```sh
+npm run release:github
+```
+
 The release command loads `.env`, fails before building if it cannot find release signing or notarization credentials, and checks the finished artifacts with `stapler` and Gatekeeper. Environment variables already set in your shell take priority over values in `.env`.
+
+The GitHub release command expects:
+
+- a clean git working tree
+- the target commit already committed locally
+- the `origin` remote configured for GitHub
+- GitHub CLI installed and authenticated with `gh auth login`
+
+It reads the current version from `package.json`, runs `npm run dist:mac`, pushes the current branch, creates tag `v<version>`, pushes that tag, and publishes a GitHub release with the generated DMG and ZIP attached.
 
 ### Notarization Credentials
 
