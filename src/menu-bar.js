@@ -138,9 +138,11 @@ async function showPairingWindow() {
 
   if (!pairingWindow) {
     pairingWindow = new BrowserWindow({
-      width: 380,
-      height: 500,
-      resizable: false,
+      width: 430,
+      height: 680,
+      minWidth: 380,
+      minHeight: 560,
+      resizable: true,
       minimizable: false,
       maximizable: false,
       fullscreenable: false,
@@ -216,17 +218,19 @@ function buildPairingHtml(pairingUrl, qrSvg, urls) {
         color: var(--ink);
         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         letter-spacing: 0;
+        overflow-y: auto;
       }
 
       main {
-        display: grid;
+        display: flex;
+        justify-content: center;
         min-height: 100vh;
-        place-items: center;
-        padding: 22px;
+        padding: 28px;
       }
 
       section {
         width: 100%;
+        max-width: 360px;
       }
 
       h1 {
@@ -266,6 +270,7 @@ function buildPairingHtml(pairingUrl, qrSvg, urls) {
 
       details {
         margin-top: 14px;
+        padding-bottom: 4px;
         color: var(--muted);
         font-size: 0.85rem;
       }
