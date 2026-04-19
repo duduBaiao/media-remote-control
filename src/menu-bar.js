@@ -14,6 +14,10 @@ import { createRemoteToken, startRemoteServer } from "./server.js";
 const appName = "Mac Remote";
 const defaultPort = Number.parseInt(process.env.PORT ?? "3000", 10);
 const fallbackPort = 0;
+const trayIconPng1x =
+  "iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAP0lEQVR4nGNgGAWkgP9QTBWDKDYcWcN/LOJEG0aMQUQZiGwIIYPwGkZVg6jmNaoENroB2CwgySCqJMhRgB0AAAAdN8mTKN1iAAAAAElFTkSuQmCC";
+const trayIconPng2x =
+  "iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAYAAADhAJiYAAAAgklEQVR4nO3TwQ6FMAhE0f7/T9eNC9NAHRAQ49zEXfPmqM8xGGOsZ/O8WjSXa3euHIScK8OgoFSYNKANrqBwlPbj2qAECoXdYSygEJTl6SCgx7AskBuVCXLBfgVy9bk/9aufPfKUUjG7ccsrC88ykI6RhpBz6aF3XoK5jpUOMsZYlw50st0jcxjxpQAAAABJRU5ErkJggg==";
 
 let tray = null;
 let pairingWindow = null;
@@ -383,23 +387,17 @@ function getIpv4Parts(url) {
 }
 
 function createTrayIcon() {
-  const namedIcon = nativeImage.createFromNamedImage("NSActionTemplate");
-
-  if (!namedIcon.isEmpty()) {
-    namedIcon.setTemplateImage(true);
-    return namedIcon;
-  }
-
-  const fallback = nativeImage.createFromDataURL(
-    `data:image/svg+xml,${encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
-        <path fill="#000" d="M3 4.5h7.2v9H3z"/>
-        <path fill="#000" d="m10.2 6 4.8-2.7v11.4L10.2 12z"/>
-      </svg>
-    `)}`
-  );
-  fallback.setTemplateImage(true);
-  return fallback;
+  const trayIcon = nativeImage.createEmpty();
+  trayIcon.addRepresentation({
+    dataURL: `data:image/png;base64,${trayIconPng1x}`,
+    scaleFactor: 1
+  });
+  trayIcon.addRepresentation({
+    dataURL: `data:image/png;base64,${trayIconPng2x}`,
+    scaleFactor: 2
+  });
+  trayIcon.setTemplateImage(true);
+  return trayIcon;
 }
 
 function showStartupError(error) {
