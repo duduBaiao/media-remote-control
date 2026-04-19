@@ -1,4 +1,4 @@
-# Mac Remote Control
+# Media Remote Control
 
 A tiny local remote for controlling media playback on your Mac from your phone.
 
@@ -16,7 +16,7 @@ npm install
 npm run app
 ```
 
-This starts **Mac Remote** as a menu bar app, launches the local remote server, and opens a pairing window with a QR code.
+This starts **Media Remote Control** as a menu bar app, launches the local remote server, and opens a pairing window with a QR code.
 
 Scan the QR code with your phone camera. The phone and Mac need to be on the same network.
 
@@ -36,11 +36,11 @@ For local testing:
 npm run package:mac
 ```
 
-The local app is written to `dist/`. Open the generated **Mac Remote.app** from there. This build uses ad-hoc signing, so it is for your Mac only.
+The local app is written to `dist/`. Open the generated **Media Remote Control.app** from there. This build uses ad-hoc signing, so it is for your Mac only.
 
 ## Build for Distribution
 
-You can distribute **Mac Remote** outside the Apple App Store by using Developer ID signing and Apple notarization.
+You can distribute **Media Remote Control** outside the Apple App Store by using Developer ID signing and Apple notarization.
 
 You need:
 
@@ -88,11 +88,11 @@ APPLE_API_ISSUER="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 Keychain profile:
 
 ```sh
-xcrun notarytool store-credentials "mac-remote-notary"
+xcrun notarytool store-credentials "media-remote-control-notary"
 ```
 
 ```text
-APPLE_KEYCHAIN_PROFILE="mac-remote-notary"
+APPLE_KEYCHAIN_PROFILE="media-remote-control-notary"
 ```
 
 If you have multiple Developer ID certificates, pick one explicitly:
@@ -108,11 +108,11 @@ For CI, you can provide the signing certificate with `CSC_LINK` and `CSC_KEY_PAS
 Release artifacts are written to `dist/`, for example:
 
 ```text
-dist/Mac Remote-0.1.0-universal.dmg
-dist/Mac Remote-0.1.0-universal.zip
+dist/Media Remote Control-0.1.0-universal.dmg
+dist/Media Remote Control-0.1.0-universal.zip
 ```
 
-Share the DMG with users. They can install it by opening the DMG and dragging **Mac Remote** to Applications.
+Share the DMG with users. They can install it by opening the DMG and dragging **Media Remote Control** to Applications.
 
 Before a broad release, test the DMG on a second Mac by downloading it the same way a user would, launching it from Applications, granting Accessibility permission, and scanning the pairing QR code from a phone on the same network.
 
@@ -143,14 +143,14 @@ The media app you want to control should be focused on the Mac.
 
 The first time a command runs, macOS may block the key press.
 
-If you use the menu bar app, grant Accessibility permission to **Mac Remote**.
+If you use the menu bar app, grant Accessibility permission to **Media Remote Control**.
 
 If you use `npm start`, grant Accessibility permission to the terminal app that started the server.
 
 1. Open **System Settings**.
 2. Go to **Privacy & Security**.
 3. Open **Accessibility**.
-4. Enable **Mac Remote** or your terminal app, such as Terminal, iTerm, or Ghostty.
+4. Enable **Media Remote Control** or your terminal app, such as Terminal, iTerm, or Ghostty.
 5. Restart the app or server.
 
 ## Configuration

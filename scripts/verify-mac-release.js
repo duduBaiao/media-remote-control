@@ -44,7 +44,7 @@ function verifyArtifact(artifact) {
     return;
   }
 
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "mac-remote-release-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "media-remote-control-release-"));
 
   try {
     run("ditto", ["-x", "-k", artifact, tempDir]);

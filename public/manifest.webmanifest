@@ -1,6 +1,6 @@
 {
-  "name": "Mac Remote",
-  "short_name": "Remote",
+  "name": "Media Remote Control",
+  "short_name": "Media Remote",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f2f3f5",

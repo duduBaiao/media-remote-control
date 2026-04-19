@@ -11,7 +11,7 @@ import {
 } from "electron";
 import { createRemoteToken, startRemoteServer } from "./server.js";
 
-const appName = "Mac Remote";
+const appName = "Media Remote Control";
 const defaultPort = Number.parseInt(process.env.PORT ?? "3000", 10);
 const fallbackPort = 0;
 const trayIconPng1x =
@@ -150,7 +150,7 @@ async function showPairingWindow() {
       minimizable: false,
       maximizable: false,
       fullscreenable: false,
-      title: "Pair Mac Remote",
+      title: `Pair ${appName}`,
       skipTaskbar: true,
       webPreferences: {
         contextIsolation: true,
@@ -200,7 +200,7 @@ function buildPairingHtml(pairingUrl, qrSvg, urls) {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pair Mac Remote</title>
+    <title>Pair ${escapeHtml(appName)}</title>
     <style>
       :root {
         color-scheme: light;

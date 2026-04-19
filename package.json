@@ -24,8 +24,8 @@
     "electron-builder": "^26.8.1"
   },
   "build": {
-    "appId": "com.dudu.macremote",
-    "productName": "Mac Remote",
+    "appId": "com.nostalgictouch.MediaRemoteControl",
+    "productName": "Media Remote Control",
     "artifactName": "${productName}-${version}-${arch}.${ext}",
     "electronLanguages": [
       "en-US"
@@ -46,8 +46,8 @@
       ],
       "extendInfo": {
         "LSUIElement": true,
-        "NSAppleEventsUsageDescription": "Mac Remote sends keyboard events through System Events so your phone can control focused media playback.",
-        "NSLocalNetworkUsageDescription": "Mac Remote serves a local pairing page so your phone can control this Mac on the same network."
+        "NSAppleEventsUsageDescription": "Media Remote Control sends keyboard events through System Events so your phone can control focused media playback.",
+        "NSLocalNetworkUsageDescription": "Media Remote Control serves a local pairing page so your phone can control this Mac on the same network."
       }
     }
   }
