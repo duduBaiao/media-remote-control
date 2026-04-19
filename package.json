@@ -3,12 +3,36 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "main": "src/menu-bar.js",
   "description": "A local mobile remote for Mac media playback.",
   "scripts": {
+    "app": "electron .",
+    "package:mac": "electron-builder --mac --dir",
     "start": "node src/server.js",
-    "check": "node --check src/server.js"
+    "check": "node --check src/server.js && node --check src/menu-bar.js"
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "electron": "^41.2.1",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "dev.local.mac-remote",
+    "productName": "Mac Remote",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.utilities",
+      "identity": "-",
+      "target": [
+        "dir"
+      ]
+    }
   }
 }

@@ -10,10 +10,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, "..", "public");
 
-const port = Number.parseInt(process.env.PORT ?? "3000", 10);
-const host = process.env.HOST ?? "0.0.0.0";
-const token = process.env.REMOTE_TOKEN || crypto.randomBytes(9).toString("base64url");
-const isDryRun = process.env.REMOTE_DRY_RUN === "1";
+export function createRemoteToken() {
+  return crypto.randomBytes(9).toString("base64url");
+}
 
 const commands = {
   "play-pause": {
@@ -38,12 +37,20 @@ const mimeTypes = new Map([
   [".webmanifest", "application/manifest+json; charset=utf-8"]
 ]);
 
+function getDefaultPort() {
+  return Number.parseInt(process.env.PORT ?? "3000", 10);
+}
+
+function getDefaultHost() {
+  return process.env.HOST ?? "0.0.0.0";
+}
+
 function getClientToken(requestUrl, headers) {
   const url = new URL(requestUrl, "http://localhost");
   return headers["x-remote-token"] || url.searchParams.get("token") || "";
 }
 
-function isAuthorized(request) {
+function isAuthorized(request, token) {
   return getClientToken(request.url, request.headers) === token;
 }
 
@@ -110,7 +117,7 @@ function runAppleScript(lines) {
   });
 }
 
-async function executeCommand(commandName) {
+async function executeCommand(commandName, isDryRun) {
   const command = commands[commandName];
 
   if (!command) {
@@ -139,8 +146,8 @@ async function executeCommand(commandName) {
   await runAppleScript(script);
 }
 
-async function handleCommand(request, response) {
-  if (!isAuthorized(request)) {
+async function handleCommand(request, response, token, isDryRun) {
+  if (!isAuthorized(request, token)) {
     sendJson(response, 401, { ok: false, error: "Invalid or missing remote token." });
     return;
   }
@@ -155,7 +162,7 @@ async function handleCommand(request, response) {
   }
 
   try {
-    await executeCommand(payload.command);
+    await executeCommand(payload.command, isDryRun);
     sendJson(response, 200, { ok: true, command: payload.command });
   } catch (error) {
     sendJson(response, error.status || 500, { ok: false, error: error.message });
@@ -195,7 +202,7 @@ async function serveStatic(request, response) {
   }
 }
 
-function getLocalUrls() {
+export function getLocalUrls(port, token) {
   const urls = [`http://localhost:${port}/?token=${token}`];
   const interfaces = os.networkInterfaces();
 
@@ -213,31 +220,97 @@ function getLocalUrls() {
   return [...new Set(urls)];
 }
 
-const server = http.createServer((request, response) => {
-  if (request.method === "POST" && request.url?.startsWith("/api/command")) {
-    void handleCommand(request, response);
-    return;
-  }
+export function createRemoteServer(options = {}) {
+  const token = options.token ?? process.env.REMOTE_TOKEN ?? createRemoteToken();
+  const isDryRun = options.isDryRun ?? process.env.REMOTE_DRY_RUN === "1";
+  const server = http.createServer((request, response) => {
+    if (request.method === "POST" && request.url?.startsWith("/api/command")) {
+      void handleCommand(request, response, token, isDryRun);
+      return;
+    }
 
-  if (request.method === "GET" || request.method === "HEAD") {
-    void serveStatic(request, response);
-    return;
-  }
+    if (request.method === "GET" || request.method === "HEAD") {
+      void serveStatic(request, response);
+      return;
+    }
 
-  response.writeHead(405, { Allow: "GET, HEAD, POST" });
-  response.end("Method not allowed");
-});
+    response.writeHead(405, { Allow: "GET, HEAD, POST" });
+    response.end("Method not allowed");
+  });
 
-server.listen(port, host, () => {
-  console.log(`Remote Control is running on ${host}:${port}`);
+  return {
+    server,
+    token,
+    isDryRun
+  };
+}
+
+export function startRemoteServer(options = {}) {
+  const host = options.host ?? getDefaultHost();
+  const port = options.port ?? getDefaultPort();
+  const remote = createRemoteServer(options);
+
+  return new Promise((resolve, reject) => {
+    const onError = (error) => {
+      remote.server.off("listening", onListening);
+      reject(error);
+    };
+
+    const onListening = () => {
+      remote.server.off("error", onError);
+      const address = remote.server.address();
+      const resolvedPort = typeof address === "object" && address ? address.port : port;
+      const urls = getLocalUrls(resolvedPort, remote.token);
+
+      resolve({
+        ...remote,
+        host,
+        port: resolvedPort,
+        urls,
+        close: () =>
+          new Promise((closeResolve, closeReject) => {
+            remote.server.close((error) => {
+              if (error) {
+                closeReject(error);
+                return;
+              }
+
+              closeResolve();
+            });
+          })
+      });
+    };
+
+    remote.server.once("error", onError);
+    remote.server.once("listening", onListening);
+    remote.server.listen(port, host);
+  });
+}
+
+function logStartup(details) {
+  console.log(`Remote Control is running on ${details.host}:${details.port}`);
   console.log("");
   console.log("Open one of these URLs on your phone:");
-  for (const url of getLocalUrls()) {
+  for (const url of details.urls) {
     console.log(`  ${url}`);
   }
   console.log("");
   console.log("If macOS blocks control, grant Accessibility permission to your terminal app.");
-  if (isDryRun) {
+  if (details.isDryRun) {
     console.log("Dry-run mode is enabled; commands will be logged instead of executed.");
   }
-});
+}
+
+async function runCli() {
+  try {
+    const details = await startRemoteServer();
+    logStartup(details);
+  } catch (error) {
+    console.error(error.message);
+    process.exitCode = 1;
+  }
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+  void runCli();
+}
